@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 export const ControlUploadForm = () => {
@@ -90,7 +89,7 @@ export const ControlUploadForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if(validateForm()){
-      alert(`Control ID: ${controlId}\nCategory: ${category}\nDescription: ${description}\n\nsuccessfully submitted`);
+      alert(`Control ID: ${controlId}\nCategory: ${category}\nDescription: ${description}\n\nSuccessfully submitted`);
     }
   };
 
@@ -147,7 +146,7 @@ export const ControlUploadForm = () => {
               onChange={handleOnChangeDescription}
               onBlur={handleOnBlurDescription}
               rows={4}
-              maxLength={400}
+              maxLength={500}
               className="bg-white p-2 rounded-md mt-2 border border-gray-300 max-h-32 resize-none"
             />
             <div className="min-h-12">
