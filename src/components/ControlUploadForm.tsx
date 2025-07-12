@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { DefaultTextarea } from "./FormTextarea"
 
 export const ControlUploadForm = () => {
 
@@ -6,6 +7,10 @@ export const ControlUploadForm = () => {
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState({ controlId: '', category: '', description: '' });
+  const [controls, setControls] = useState([]);
+
+  const descriptionPlaceholder = "Enter description here";
+  const descriptionLabel = "Description"
 
   const validateControlId = (value: string) => {
     const controlIdRegex = /^CTRL-\d{3}$/;
@@ -86,15 +91,60 @@ export const ControlUploadForm = () => {
     setErrors({ ...errors, description: validateDescription(value) });
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if(validateForm()){
-      alert(`Control ID: ${controlId}\nCategory: ${category}\nDescription: ${description}\n\nSuccessfully submitted`);
+      const payload = {
+        controlId,
+        category,
+        description,
+      }
+
+      try {
+        const response = await fetch("http://localhost:3000/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+          alert(data.error || "Submiossion failed");
+          return;
+        }
+
+        alert("Submission successful");
+        fetchControls();
+
+      } catch (error) {
+        alert(`Network error occurred. Please try again later`);
+      }
     }
   };
 
+  const fetchControls = async() => {
+    try{
+      const response = await fetch("http://localhost:3000/controls");
+      if(!response.ok){
+        alert("Unable to fetch controls");
+        return;
+      }
+      const data = await response.json();
+      setControls(data);
+    } catch(err: any) {
+      alert(err?.error || "Error fetching controls");
+    }
+  }
+
+  useEffect(() => {
+    fetchControls();
+  }, [])
+
   return(
-    <div className="flex flex-col justify-center items-center h-screen bg-[#040c18]">
+    <div className="flex flex-row gap-8 justify-center h-screen bg-[#040c18]">
       <div className="rounded-md p-6 bg-[#f7fbffee] h-[550px] w-80">
         <h2 className="text-[#1d798d] text-xl font-bold text-center">Control Framework Upload</h2>
         <form 
@@ -138,21 +188,16 @@ export const ControlUploadForm = () => {
               {errors.category && <p className="text-red-500 text-sm mt-2">{errors.category}</p>}
             </div>
           </div>
-          <div className="flex flex-col">
-            <label className="font-semibold">Description</label>
-            <textarea
-              value={description}
-              placeholder='e.g., implement multi-factor authentication'
-              onChange={handleOnChangeDescription}
-              onBlur={handleOnBlurDescription}
-              rows={4}
-              maxLength={500}
-              className="bg-white p-2 rounded-md mt-2 border border-gray-300 max-h-32 resize-none"
-            />
-            <div className="min-h-12">
-              {errors.description && <p className="text-red-500 text-sm mt-2">{errors.description}</p>}
-            </div>
-          </div>
+          <DefaultTextarea
+            value={description}
+            error={errors.description}
+            onChange={handleOnChangeDescription}
+            onBlur={handleOnBlurDescription}
+            rows={5}
+            maxLength={400}
+            placeholder={descriptionPlaceholder}
+            label={descriptionLabel}
+          />
             <button
               type='submit'
               disabled={!controlId || !category || !description || !!errors.controlId || !!errors.category || !!errors.description}
@@ -161,6 +206,16 @@ export const ControlUploadForm = () => {
               Submit
             </button>
         </form>
+      </div>
+
+      <div className="rounded-md p-6 bg-[#f7fbffee] min-h-10 w-80">
+      {controls.map((control: any) => (
+        <div key={control.controlId} className="mb-8">
+          <h2>Control ID: {control.controlId}</h2>
+          <p>Category: {control.category}</p>
+          <p>Description: {control.description}</p>
+        </div>
+      ))}
       </div>
     </div>
   );

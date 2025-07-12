@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type Control struct {
@@ -17,6 +18,7 @@ var controls []Control
 
 func main() {
 	app := fiber.New()
+	app.Use(cors.New())
 
 	app.Post("/submit", func(c *fiber.Ctx) error {
 		var control Control
@@ -46,7 +48,7 @@ func main() {
 
 		controls = append(controls, control)
 
-		return c.JSON(fiber.Map{"message": "Submission successful", "deletedControl": control})
+		return c.JSON(fiber.Map{"message": "Submission successful", "control": control})
 	})
 
 	app.Get("/controls", func(c *fiber.Ctx) error {
@@ -100,7 +102,7 @@ func main() {
 				deletedControl := controls[i]
 				controls = append(controls[:i], controls[i+1:]...)
 
-				return c.JSON(fiber.Map{"message": "Control deleted successfully", "control": deletedControl})
+				return c.JSON(fiber.Map{"message": "Control deleted successfully", "deletedControl": deletedControl})
 			}
 		}
 		return c.Status(404).JSON(fiber.Map{"error": "Control not found"})
