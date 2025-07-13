@@ -5,12 +5,11 @@ interface ModalProps {
     title?: string;
     buttonLabel: string;
     children?: React.ReactNode;
-    onClose?: () => void;
     onOpen?: () => void; 
     onDelete?: () => void;
 }
 
-export const Modal = ({ title, buttonLabel, children, onClose, onOpen, onDelete }: ModalProps) => {
+export const Modal = ({ title, buttonLabel, children, onOpen, onDelete }: ModalProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const modal = useRef(null);
 
