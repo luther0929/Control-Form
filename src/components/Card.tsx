@@ -1,10 +1,10 @@
 import React from "react";
 
 interface CardProps {
-    title?: string
-    subtitle?: string
-    description?: string
-    button?: React.ReactNode
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    button?: React.ReactNode;
 }
 
 export const Card = ({
@@ -35,7 +35,6 @@ export const Card = ({
           )}
         </div>
       </div>
-      {/*  */}
     </>
   );
 };
