@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"regexp"
 
 	"github.com/gofiber/fiber/v2"
@@ -108,7 +109,12 @@ func main() {
 		return c.Status(404).JSON(fiber.Map{"error": "Control not found"})
 	})
 
-	if err := app.Listen(":3000"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	if err := app.Listen(":" + port); err != nil {
 		log.Fatal(err)
 	}
 }

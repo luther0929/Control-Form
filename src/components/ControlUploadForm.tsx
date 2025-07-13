@@ -14,7 +14,6 @@ export const ControlUploadForm = () => {
   const [errors, setErrors] = useState({ controlId: '', category: '', description: '' });
   const [controls, setControls] = useState<Control[]>([]);
 
-  const [editingControl, setEditingControl] = useState<Control | null>(null);
   const [editFormData, setEditFormData] = useState({ controlId: '', category: '', description: '' })
   const [editErrors, setEditErrors] = useState({ controlId: '', category: '', description: '' })
 
@@ -154,7 +153,8 @@ export const ControlUploadForm = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:3000/submit", {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+        const response = await fetch(`${API_URL}/submit`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -180,7 +180,8 @@ export const ControlUploadForm = () => {
 
   const fetchControls = async() => {
     try{
-      const response = await fetch("http://localhost:3000/controls");
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/controls`);
       if(!response.ok){
         alert("Unable to fetch controls");
         return;
@@ -215,7 +216,8 @@ export const ControlUploadForm = () => {
     }
 
     try{
-      const response = await fetch(`http://localhost:3000/controls/${control.controlId}`, {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/controls/${control.controlId}`, {
         method: "PUT",
         headers: {
           "content-type": "application/json",
@@ -249,7 +251,8 @@ export const ControlUploadForm = () => {
 
   const handleDelete = async (controlId: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/controls/${controlId}`,{
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/controls/${controlId}`,{
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -337,7 +340,6 @@ export const ControlUploadForm = () => {
               <Modal 
                 title="Update Control"
                 buttonLabel="Update"
-                onClose={() => {}}
                 onOpen={() => initializeEditForm(control)}
                 onDelete={() => handleDelete(control.controlId)}
               >
