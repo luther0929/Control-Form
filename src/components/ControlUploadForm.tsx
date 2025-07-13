@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { DefaultTextarea } from "./FormTextarea"
+import { Input } from "./FormInput";
+import { Select } from "./FormSelect";
+import { Textarea } from "./FormTextarea";
+import { Card } from "./Card"
+import { Button } from "./Button";
 
 export const ControlUploadForm = () => {
 
@@ -9,8 +13,14 @@ export const ControlUploadForm = () => {
   const [errors, setErrors] = useState({ controlId: '', category: '', description: '' });
   const [controls, setControls] = useState([]);
 
-  const descriptionPlaceholder = "Enter description here";
+  const controlIdLabel = "Control ID"
+  const controlIdPlaceholder = "CTRL-XXX"
+  const categoryLabel = "Category"
+  const categoryPlaceholder = "Select category"
+  const categoryOptions = [{ value: "Access Control", label: "Access Control" }, { value: "Data Protection", label: "Data Protection" }, { value: "Monitoring", label: "Monitoring" }]
   const descriptionLabel = "Description"
+  const descriptionPlaceholder = "Enter description here";
+  
 
   const validateControlId = (value: string) => {
     const controlIdRegex = /^CTRL-\d{3}$/;
@@ -144,78 +154,74 @@ export const ControlUploadForm = () => {
   }, [])
 
   return(
-    <div className="flex flex-row gap-8 justify-center h-screen bg-[#040c18]">
-      <div className="rounded-md p-6 bg-[#f7fbffee] h-[550px] w-80">
-        <h2 className="text-[#1d798d] text-xl font-bold text-center">Control Framework Upload</h2>
+    <div className="flex gap-8 justify-center  min-h-screen bg-[#040c18]">
+      <div className="rounded-md p-6 m-8 bg-[#f7fbffee] w-auto self-start">
+        <h1 className="text-[#1d798d] text-xl font-bold text-center">Control Framework Upload</h1>
         <form 
           onSubmit={handleSubmit} 
-          className="text-center items-center gap-4 my-6"
+          className="flex flex-col gap-4 my-6"
         >
-          <div className="flex flex-col">
-            <label className="font-semibold">Control ID</label>
-            <input
-              type='text'
-              value={controlId}
-              placeholder="e.g., CTRL-001"
-              onChange={handleOnChangeControlId}
-              onBlur={handleOnBlurControlId}
-              className="bg-white mt-2 rounded-md p-2 border-1 border-gray-300"
-            />
-            <div className="min-h-8">
-              {errors.controlId && <p className="text-red-500 text-sm mt-2">{errors.controlId}</p>}
+          <div className="flex flex-row gap-12">
+            <div>
+              <Input
+                value={controlId}
+                error={errors.controlId}
+                onChange={handleOnChangeControlId}
+                onBlur={handleOnBlurControlId}
+                placeholder={controlIdPlaceholder}
+                label={controlIdLabel}
+              />
+              <Select
+                value={category}
+                error={errors.category}
+                onChange={handleOnChangeCategory}
+                onBlur={handleOnBlurCategory}
+                options={categoryOptions}
+                placeholder={categoryPlaceholder}
+                label={categoryLabel}
+              />
+            </div>
+            <div>
+              <Textarea
+                value={description}
+                error={errors.description}
+                onChange={handleOnChangeDescription}
+                onBlur={handleOnBlurDescription}
+                rows={5}
+                maxLength={400}
+                placeholder={descriptionPlaceholder}
+                label={descriptionLabel}
+              />
             </div>
           </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="category"
-              className="font-semibold mb-2"
-            >
-              Category
-            </label>
-            <select 
-              id="category"
-              value={category}
-              onChange={handleOnChangeCategory}
-              onBlur={handleOnBlurCategory}
-              className={`bg-white ${category=='' ? 'text-gray-500' : 'text-black'}`}
-            >
-              <option value='' className="text-gray-500">Select a category</option>
-              <option value='Access Control' className="text-black">Access Control</option>
-              <option value='Data Protection' className="text-black">Data Protection</option>
-              <option value='Monitoring' className="text-black">Monitoring</option>
-            </select>
-            <div className="min-h-8">
-              {errors.category && <p className="text-red-500 text-sm mt-2">{errors.category}</p>}
-            </div>
-          </div>
-          <DefaultTextarea
-            value={description}
-            error={errors.description}
-            onChange={handleOnChangeDescription}
-            onBlur={handleOnBlurDescription}
-            rows={5}
-            maxLength={400}
-            placeholder={descriptionPlaceholder}
-            label={descriptionLabel}
-          />
-            <button
+          
+          <div className="flex justify-center">
+            <Button
               type='submit'
-              disabled={!controlId || !category || !description || !!errors.controlId || !!errors.category || !!errors.description}
-              className="bg-[#1d798d] text-white px-6 py-3 mt-4 rounded-full hover:bg-green-400 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-              Submit
-            </button>
+              isDisabled={!controlId || !category || !description || !!errors.controlId || !!errors.category || !!errors.description}
+              label="Submit"
+            />
+          </div>
         </form>
       </div>
 
-      <div className="rounded-md p-6 bg-[#f7fbffee] min-h-10 w-80">
-      {controls.map((control: any) => (
+      <div className="max-h-[500px] overflow-y-auto m-8 rounded-md p-6 bg-[#f7fbffee] min-h-10 w-80">
+      {controls?.slice().reverse().map((control: any) => (
         <div key={control.controlId} className="mb-8">
-          <h2>Control ID: {control.controlId}</h2>
-          <p>Category: {control.category}</p>
-          <p>Description: {control.description}</p>
+          <Card
+            title={control.controlId}
+            subtitle={control.category}
+            description={control.description}
+            button={
+              <Button
+                type="button"
+                label="Update"
+              />
+            }
+          />
         </div>
       ))}
+      {(!controls || controls.length === 0) && <p className="text-gray-500">No controls yet</p>}
       </div>
     </div>
   );
